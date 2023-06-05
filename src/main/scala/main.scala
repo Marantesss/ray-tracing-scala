@@ -1,5 +1,8 @@
 package com.marantesss.raytracingscala
 
+import com.marantesss.raytracingscala.props.HitResult.{Hit, NoHit}
+import com.marantesss.raytracingscala.props.Sphere
+
 import java.io.{File, PrintWriter}
 
 @main
@@ -38,9 +41,15 @@ def main(): Unit = {
     )
 }
 
-def rayColor(ray: Ray): Color =
-  val t = 0.5 * (ray.direction.unit.y + 1)
-  println(s"t: $t")
-  Color.white.lerpStart(t, Color.skyBlue)
+def rayColor(ray: Ray): Color = Sphere(Vec3(0, 0, -1), 0.5).hit(ray, 0, 1) match
+  case NoHit => {
+    val t = 0.5 * (ray.direction.unit.y + 1)
+    Color.white.lerpStart(t, Color.skyBlue)
+  }
+  case Hit(_p, _n, t) => {
+    val n = (ray.at(t) - Vec3(0, 0, -1)).unit
+    0.5 * Color.fromRatio(n.x + 1, n.y + 1, n.z + 1)
+  }
+
 
 
