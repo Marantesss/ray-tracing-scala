@@ -2,6 +2,7 @@ package com.marantesss.raytracingscala
 
 import com.marantesss.raytracingscala.props.HitResult.{Hit, NoHit}
 import com.marantesss.raytracingscala.props.Sphere
+import com.marantesss.raytracingscala.utils.{Color, Ray, Vec3}
 
 import java.io.{File, PrintWriter}
 

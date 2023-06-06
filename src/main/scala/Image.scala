@@ -1,5 +1,7 @@
 package com.marantesss.raytracingscala
 
+import com.marantesss.raytracingscala.utils.Color
+
 import java.io.PrintWriter
 
 case class Image(

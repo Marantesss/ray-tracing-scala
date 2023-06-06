@@ -1,4 +1,5 @@
 package com.marantesss.raytracingscala
+package utils
 
 /**
  * Byte is [-128, ..., 127]

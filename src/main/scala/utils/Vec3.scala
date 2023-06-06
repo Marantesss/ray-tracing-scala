@@ -1,6 +1,5 @@
 package com.marantesss.raytracingscala
-
-import scala.annotation.targetName
+package utils
 
 case class Vec3(
   x: Double,

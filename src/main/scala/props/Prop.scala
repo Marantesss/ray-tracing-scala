@@ -1,6 +1,8 @@
 package com.marantesss.raytracingscala
 package props
 
+import utils.{Ray, Vec3}
+
 enum HitResult:
   case NoHit
   case Hit(
