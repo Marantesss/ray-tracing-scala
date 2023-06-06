@@ -74,19 +74,23 @@ We'll need a data structure to model an image, something like this should do the
 case class Image(width: Int, height: Int, content: Seq[Seq[Color]] = Seq.empty)
 ```
 
+We can then declare some methods to write the `Image`'s content to a file:
+
 ```scala
-  def rowToString(row: Seq[Color]): String = row
-    .foldLeft("")((accRow, byte) => s"$accRow$byte ")
-    .trim
-  
-  def write(writer: PrintWriter): Unit =
-    // header
-    writer.write(s"P3\n$width $height\n${Color.BYTE_SIZE}\n")
-    // content
-    content.foreach(writer.write(s"${rowToString(_)}\n")
+def rowToString(row: Seq[Color]): String = row
+  .foldLeft("")((accRow, byte) => s"$accRow$byte ")
+  .trim
+
+def write(writer: PrintWriter): Unit =
+  // header
+  writer.write(s"P3\n$width $height\n${Color.BYTE_SIZE}\n")
+  // content
+  content.foreach(writer.write(s"${rowToString(_)}\n")
 ```
 
 ##### The rainbow effect
+
+Just for f
 
 ```scala
 def fillRainbow(): Image = copy(
@@ -94,11 +98,12 @@ def fillRainbow(): Image = copy(
     val r = w.toDouble / (this.width - 1)
     val g = (this.height - 1 - h).toDouble / (this.width - 1)
     val b = 0.25
-    
     Color.fromRatio(r, g, b)
   )
 )
 ```
+
+![](media/book-1/2.1-rainbow.png)
 
 ### 1.3. The `Vec3` class
 
@@ -123,15 +128,13 @@ case class Ray(origin: Vec3, direction: Vec3):
 
 TBD
 
-![](media/book-1/2.1-rainbow.ppm)
+![](media/book-1/4.1-sky.png)
 
-![](media/book-1/4.1-sky.ppm)
+![](media/book-1/5.1-simple-red-sphere.png)
 
-![](media/book-1/5.1-simple-red-sphere.ppm)
+![](media/book-1/6.1-surface-normals.png)
 
-![](media/book-1/6.1-surface-normals.ppm)
-
-![](media/book-1/6.2-surface-normals-ground.ppm)
+![](media/book-1/6.2-surface-normals-ground.png)
 
 ## Book 2: [_Ray Tracing The Next Week_](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
 
