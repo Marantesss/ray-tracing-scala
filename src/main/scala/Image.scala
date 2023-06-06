@@ -11,7 +11,7 @@ case class Image(
 ):
 
   def fillEmpty(): Image = copy(
-    content = Seq.fill[Color](this.height, this.width)(Color(0, 0, 0))
+    content = Seq.fill[Color](this.height, this.width)(Color.black)
   )
 
   def fillRainbow(): Image = copy(

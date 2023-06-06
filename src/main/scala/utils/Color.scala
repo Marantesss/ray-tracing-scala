@@ -36,6 +36,7 @@ object Color:
     (z * BYTE_SIZE).toInt,
   )
   def white: Color = Color(255, 255, 255)
+  def black: Color = Color(0, 0, 0)
   def skyBlue: Color = Color.fromRatio(0.5, 0.7, 1.0)
   def red: Color = Color.fromRatio(1, 0, 0)
 end Color
