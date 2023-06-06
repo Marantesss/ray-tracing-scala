@@ -23,7 +23,7 @@ case class Sphere(
    * @param ray ray to test the hit
    * @param tMin consider only hits that have a larger t that tMin
    * @param tMax consider only hits that have a lower t that tMax
-   * @return
+   * @return HitResult
    */
   def hit(ray: Ray, tMin: Double, tMax: Double): HitResult =
     val origin = ray.origin - center
@@ -42,11 +42,12 @@ case class Sphere(
       (-halfB + sqrtDiscriminant) / a,
     ).find(x => !(x < tMin || x > tMax))
 
-    if t.isEmpty then return HitResult.NoHit
-
-    val point =  ray.at(t.get)
-    HitResult.Hit(
-      point = point,
-      normal = (point - center) / radius,
-      t = t.get,
-    )
+    if t.isEmpty then
+      HitResult.NoHit
+    else
+      val point = ray.at(t.get)
+      HitResult.Hit(
+        point = point,
+        normal = (point - center) / radius,
+        t = t.get,
+      ).setFaceNormal(ray)

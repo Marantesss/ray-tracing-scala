@@ -1,6 +1,8 @@
 package com.marantesss.raytracingscala
 package utils
 
+import scala.annotation.targetName
+
 case class Vec3(
   x: Double,
   y: Double,
@@ -16,7 +18,7 @@ case class Vec3(
   def -(that: Vec3): Vec3 = Vec3(x - that.x, y - that.y, z - that.z)
   def *(operand: Double): Vec3 = Vec3(x * operand, y * operand, z * operand)
   def /(operand: Double): Vec3 = this * (1 / operand)
-  def -(): Vec3 = Vec3(-x, -y, -z)
+  def unary_- = Vec3(-x, -y, -z)
 
   def dot(that: Vec3): Double = x * that.x + y * that.y + z * that.z
   def cross(that: Vec3): Vec3 = Vec3(
