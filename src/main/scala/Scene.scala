@@ -19,7 +19,6 @@ case class Scene(
       p.hit(ray, tMin, closestSoFar) match
         case NoHit => None
         case Hit(p, n, t, f) =>
-          println(s"normal: $n")
           closestSoFar = t
           hitResult = Hit(p, n, t, f)
     )
