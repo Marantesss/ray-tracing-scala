@@ -73,27 +73,27 @@ case class Image(width: Int, height: Int, content: Seq[Seq[Color]] = Seq.empty)
 ```
 
 ```scala
-  def rowToString(row: Seq[Color]): String = row.foldLeft("")((accRow, byte) => s"$accRow$byte ").trim
-  
-  def write(writer: PrintWriter): Unit =
-    // header
-    writer.write(s"P3\n$width $height\n${Color.BYTE_SIZE}\n")
-    // content
-    content.foreach(writer.write(s"${rowToString(_)}\n")
+def rowToString(row: Seq[Color]): String = row.foldLeft("")((accRow, byte) => s"$accRow$byte ").trim
+
+def write(writer: PrintWriter): Unit =
+// header
+writer.write(s"P3\n$width $height\n${Color.BYTE_SIZE}\n")
+// content
+content.foreach(writer.write(s"${rowToString(_)}\n")
 ```
 
 ##### The rainbow effect
 
 ```scala
-  def fillRainbow(): Image = copy(
-    content = Seq.tabulate[Color](this.height, this.width)((h: Int, w: Int) =>
-      val r = w.toDouble / (this.width - 1)
-      val g = (this.height - 1 - h).toDouble / (this.width - 1)
-      val b = 0.25
+def fillRainbow(): Image = copy(
+content = Seq.tabulate[Color](this.height, this.width)((h: Int, w: Int) =>
+  val r = w.toDouble / (this.width - 1)
+  val g = (this.height - 1 - h).toDouble / (this.width - 1)
+  val b = 0.25
 
-      Color.fromRatio(r, g, b)
-    )
-  )
+  Color.fromRatio(r, g, b)
+)
+)
 ```
 
 ### 1.3. The `Vec3` class
