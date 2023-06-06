@@ -11,6 +11,8 @@ The goal behind this project is really just:
 This document is divided in 3 sections (one for each book of the series). In each section you'll find the generated
 image after each new feature implementation as well as a brief explanation of my implementation.
 
+> ⚠️ Code snippets on this README are simplified for readibility reasons ⚠️
+
 ## Book 1: [_Ray Tracing in One Weekend_](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
 
 ### 1.2. Outputing an image
@@ -78,10 +80,10 @@ case class Image(width: Int, height: Int, content: Seq[Seq[Color]] = Seq.empty)
     .trim
   
   def write(writer: PrintWriter): Unit =
-  // header
-  writer.write(s"P3\n$width $height\n${Color.BYTE_SIZE}\n")
-  // content
-  content.foreach(writer.write(s"${rowToString(_)}\n")
+    // header
+    writer.write(s"P3\n$width $height\n${Color.BYTE_SIZE}\n")
+    // content
+    content.foreach(writer.write(s"${rowToString(_)}\n")
 ```
 
 ##### The rainbow effect
