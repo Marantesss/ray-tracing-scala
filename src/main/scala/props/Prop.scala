@@ -6,9 +6,24 @@ import utils.{Ray, Vec3}
 enum HitResult:
   case NoHit
   case Hit(
+    /**
+     * 3D coords where the ray hit the prop
+     */
     point: Vec3,
+
+    /**
+     * prop surface perpendicular vector starting in point
+     */
     normal: Vec3,
+
+    /**
+     * distance from ray origin and point
+     */
     t: Double,
+
+    /**
+     * was the prop hit from the inside (backFacing) or the outside (frontFacing)
+     */
     frontFacing: Boolean = true,
   )
 
@@ -21,11 +36,19 @@ enum HitResult:
    * @return
    */
   def setFaceNormal(ray: Ray): HitResult = this match
-    case NoHit => NoHit
-    case Hit(p, n, t, _) =>
+    case HitResult.NoHit => NoHit
+    case HitResult.Hit(p, n, t, _) =>
       val frontFacing = ray.direction.dot(n) < 0
       val normal = if frontFacing then n else -n
       Hit(p, normal, t, frontFacing)
+
+  /**
+   * TODO refactor this enum to avoid hacks like these
+   * @return
+   */
+  def distanceToOrigin: Double = this match
+    case HitResult.NoHit => Double.MinValue
+    case HitResult.Hit(_p, _n, t, _) => t
 
 
 

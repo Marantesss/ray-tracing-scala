@@ -8,11 +8,18 @@ import com.marantesss.raytracingscala.props.HitResult.{Hit, NoHit}
 case class Scene(
   props: Seq[Prop]
 ):
-  /**
-   * TODO fetch closest prop to camera instead of calculating hits for every prop
-   * refactor this into a more functional style syntax
-   */
   def propHits(ray: Ray, tMin: Double, tMax: Double): HitResult =
+    props
+      .map(_.hit(ray, tMin, tMax)) // calculate hits
+      .sortWith(_.distanceToOrigin < _.distanceToOrigin) // order by closest prop to origin/camera
+      .find { // fetch the first (closest) hit
+        case Hit(_p, _n, _t, _f) => true
+        case _ => false
+      }
+      .getOrElse(NoHit) // if not found then NoHit
+    /*
+    // this approach is better because if avoids calculating hits, when a lower t has been found
+    // but its kind of ugly and required mutable data
     var hitResult = NoHit
     var closestSoFar = tMax
     props.foreach(p =>
@@ -23,6 +30,7 @@ case class Scene(
           hitResult = Hit(p, n, t, f)
     )
     hitResult
+    */
 
   def rayColor(ray: Ray): Color = this.propHits(ray, 0, Double.MaxValue) match
     case NoHit => Color.white.lerpStart(0.5 * (ray.direction.unit.y + 1.0), Color.skyBlue)
