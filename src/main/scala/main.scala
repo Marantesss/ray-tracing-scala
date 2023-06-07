@@ -9,8 +9,8 @@ import java.io.{File, PrintWriter}
 def main(): Unit = {
   // Image
   val aspectRatio = 16.0 / 9.0
-  val width = 400
-  val height = (400 / aspectRatio).toInt
+  val width       = 400
+  val height      = (400 / aspectRatio).toInt
 
   val viewport = Viewport(
     origin = Vec3.zero,
@@ -23,21 +23,21 @@ def main(): Unit = {
     Seq(
       Sphere(Vec3(0, -100.5, -1), 100),
       Sphere(Vec3(0, 0, -1), 0.5),
-    )
+    ),
   )
 
   // Render
   renderImage(viewport, scene, height, width)
     .write(
-      PrintWriter(File("batata.ppm"))
+      PrintWriter(File("batata.ppm")),
     )
 }
 
 def renderImage(
- viewport: Viewport,
- scene: Scene,
- imageHeight: Int,
- imageWidth: Int,
+    viewport: Viewport,
+    scene: Scene,
+    imageHeight: Int,
+    imageWidth: Int,
 ): Image =
   Image(imageWidth, imageHeight)
     .fillContent(
@@ -47,12 +47,8 @@ def renderImage(
         scene.rayColor(
           Ray(
             viewport.origin,
-            viewport.calculatePoint(u, v)
-          )
-        )
-      )
+            viewport.calculatePoint(u, v),
+          ),
+        ),
+      ),
     )
-
-
-
-

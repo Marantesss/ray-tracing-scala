@@ -5,13 +5,12 @@ import com.marantesss.raytracingscala.utils.Color
 import java.io.PrintWriter
 
 case class Image(
-  width: Int,
-  height: Int,
-  content: Seq[Seq[Color]] = Seq.empty,
+    width: Int,
+    height: Int,
+    content: Seq[Seq[Color]] = Seq.empty,
 ):
-
   def fillEmpty(): Image = copy(
-    content = Seq.fill[Color](this.height, this.width)(Color.black)
+    content = Seq.fill[Color](this.height, this.width)(Color.black),
   )
 
   def fillRainbow(): Image = copy(
@@ -20,8 +19,8 @@ case class Image(
       val g = (this.height - 1 - h).toDouble / (this.width - 1)
       val b = 0.25
 
-      Color.fromRatio(r, g, b)
-    )
+      Color.fromRatio(r, g, b),
+    ),
   )
 
   def fillContent(content: Seq[Seq[Color]]): Image = copy(content = content)
@@ -30,12 +29,13 @@ case class Image(
     println(s"${(percentage * 100).toInt}%")
     Console.flush()
 
-  /**
-   * Takes too long and consumes too much memory
-   */
-  def contentToString: String = content.foldLeft("")((acc, row) => row.foldLeft(acc)((accRow, byte) => s"$accRow$byte ").trim)
+  /** Takes too long and consumes too much memory
+    */
+  def contentToString: String =
+    content.foldLeft("")((acc, row) => row.foldLeft(acc)((accRow, byte) => s"$accRow$byte ").trim)
 
-  def rowToString(row: Seq[Color]): String = row.foldLeft("")((accRow, byte) => s"$accRow$byte ").trim
+  def rowToString(row: Seq[Color]): String =
+    row.foldLeft("")((accRow, byte) => s"$accRow$byte ").trim
 
   def write(writer: PrintWriter): Unit =
     // header

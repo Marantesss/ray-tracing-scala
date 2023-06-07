@@ -1,13 +1,12 @@
 package com.marantesss.raytracingscala
 package utils
 
-/**
- * Byte is [-128, ..., 127]
- */
-case class Color (
-  red: Int,
-  green: Int,
-  blue: Int,
+/** Byte is [-128, ..., 127]
+  */
+case class Color(
+    red: Int,
+    green: Int,
+    blue: Int,
 ):
   override def toString: String = s"$red $green $blue"
 
@@ -23,9 +22,8 @@ case class Color (
     blue + that.blue,
   )
 
-  /**
-   * Linear interpolation
-   */
+  /** Linear interpolation
+    */
   def lerpStart(t: Double, endColor: Color): Color = (1.0 - t) * this + t * endColor
 
 object Color:
@@ -35,8 +33,8 @@ object Color:
     (y * BYTE_SIZE).toInt,
     (z * BYTE_SIZE).toInt,
   )
-  def white: Color = Color(255, 255, 255)
-  def black: Color = Color(0, 0, 0)
+  def white: Color   = Color(255, 255, 255)
+  def black: Color   = Color(0, 0, 0)
   def skyBlue: Color = Color.fromRatio(0.5, 0.7, 1.0)
-  def red: Color = Color.fromRatio(1, 0, 0)
+  def red: Color     = Color.fromRatio(1, 0, 0)
 end Color
