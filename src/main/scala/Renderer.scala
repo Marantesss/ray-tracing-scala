@@ -22,7 +22,7 @@ case class Renderer(
           val v = (height - 1 - h + random) / (height - 1)
           scene.rayColor(viewport.getRay(u, v))
         }
-        .fold(Color.white)((acc, color) => acc + color)
+        .reduce((acc, color) => acc + color)
         /
           samplesPerPixel,
     )
