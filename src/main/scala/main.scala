@@ -4,6 +4,7 @@ import com.marantesss.raytracingscala.props.Sphere
 import com.marantesss.raytracingscala.utils.{Color, Ray, Vec3}
 
 import java.io.{File, PrintWriter}
+import scala.util.Random
 
 @main
 def main(): Unit = {
@@ -12,12 +13,7 @@ def main(): Unit = {
   val width       = 400
   val height      = (400 / aspectRatio).toInt
 
-  val viewport = Viewport(
-    origin = Vec3.zero,
-    height = 2.0,
-    width = 2.0 * aspectRatio,
-    focalLength = 1.0,
-  )
+  val viewport = Viewport()
 
   val scene = Scene(
     Seq(
@@ -26,29 +22,12 @@ def main(): Unit = {
     ),
   )
 
+  val content = Renderer(viewport, scene).renderContent(width, height)
+
   // Render
-  renderImage(viewport, scene, height, width)
+  Image(width, height)
+    .fillContent(content)
     .write(
       PrintWriter(File("batata.ppm")),
     )
 }
-
-def renderImage(
-    viewport: Viewport,
-    scene: Scene,
-    imageHeight: Int,
-    imageWidth: Int,
-): Image =
-  Image(imageWidth, imageHeight)
-    .fillContent(
-      Seq.tabulate[Color](imageHeight, imageWidth)((h, w) =>
-        val u = w.toDouble / (imageWidth - 1)
-        val v = (imageHeight - 1 - h).toDouble / (imageHeight - 1)
-        scene.rayColor(
-          Ray(
-            viewport.origin,
-            viewport.calculatePoint(u, v),
-          ),
-        ),
-      ),
-    )

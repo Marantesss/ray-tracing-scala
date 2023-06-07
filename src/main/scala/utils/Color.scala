@@ -16,6 +16,12 @@ case class Color(
     (blue * operand).toInt,
   )
 
+  def /(operand: Double): Color = Color(
+    (red / operand).toInt,
+    (green / operand).toInt,
+    (blue / operand).toInt,
+  )
+
   def +(that: Color): Color = Color(
     red + that.red,
     green + that.green,

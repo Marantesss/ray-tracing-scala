@@ -17,20 +17,6 @@ case class Scene(
         case _                   => false
       }
       .getOrElse(NoHit) // if not found then NoHit
-    /*
-    // this approach is better because if avoids calculating hits, when a lower t has been found
-    // but its kind of ugly and required mutable data
-    var hitResult = NoHit
-    var closestSoFar = tMax
-    props.foreach(p =>
-      p.hit(ray, tMin, closestSoFar) match
-        case NoHit => None
-        case Hit(p, n, t, f) =>
-          closestSoFar = t
-          hitResult = Hit(p, n, t, f)
-    )
-    hitResult
-     */
 
   def rayColor(ray: Ray): Color = this.propHits(ray, 0, Double.MaxValue) match
     case NoHit => Color.white.lerpStart(0.5 * (ray.direction.unit.y + 1.0), Color.skyBlue)
