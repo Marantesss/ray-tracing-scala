@@ -5,7 +5,9 @@ This repository hosts my take on  [_Ray Tracing in One Weekend Book Series_](htt
 
 The goal behind this project is really just:
 1. Further develop my Scala and Functional Programming skills
-2. Try out testing in Scala testing using [ScalaTest](https://www.scalatest.org/)
+2. Try out Scala tools, such as:
+   1. [ScalaTest](https://www.scalatest.org/) for testing
+   2. [Scalafmt](https://scalameta.org/scalafmt/) for linting and formatting
 3. Have some fun with basic Computer Graphics
 
 This document is divided in 3 sections (one for each book of the series). In each section you'll find the generated
