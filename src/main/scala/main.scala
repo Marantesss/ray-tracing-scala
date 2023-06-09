@@ -1,5 +1,6 @@
 package com.marantesss.raytracingscala
 
+import com.marantesss.raytracingscala.material.Metal
 import com.marantesss.raytracingscala.props.Sphere
 import com.marantesss.raytracingscala.utils.{Color, Ray, Vec3}
 
@@ -17,8 +18,8 @@ def main(): Unit = {
 
   val scene = Scene(
     Seq(
-      Sphere(Vec3(0, -100.5, -1), 100),
-      Sphere(Vec3(0, 0, -1), 0.5),
+      Sphere(Vec3(0, -100.5, -1), 100, Metal(Color.black)),
+      Sphere(Vec3(0, 0, -1), 0.5, Metal(Color.black)),
     ),
   )
 

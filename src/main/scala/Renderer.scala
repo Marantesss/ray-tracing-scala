@@ -1,8 +1,6 @@
 package com.marantesss.raytracingscala
 
-import utils.{Color, Ray, Vec3}
-
-import com.marantesss.raytracingscala.props.HitResult.{Hit, NoHit}
+import utils.{Color, Ray, Vec3, HitResult}
 
 import scala.util.Random
 
@@ -46,13 +44,13 @@ case class Renderer(
   def rayColor(ray: Ray, depth: Int = MAX_RAY_BOUNCE): Color =
     // println(s"\t\trendering ray hit: ${MAX_RAY_BOUNCE - depth + 1}")
     // If we've exceeded the ray bounce limit, no more light is gathered.
-    if (depth <= 0) then return Color.fromRatio(0, 0, 0);
+    if (depth <= 0) then return Color.black
 
     scene.propHits(ray, T_MIN, Double.MaxValue) match
-      case NoHit =>
+      case None =>
         Color.white.lerpStart(0.5 * (ray.direction.unit.y + 1.0), Color.skyBlue)
-      case Hit(p, n, t, _f) =>
-        val bounceDirection = (p + n + Vec3.randomInUnitSphereUnit) - p
-        0.5 * rayColor(Ray(p, bounceDirection), depth - 1)
+      case Some(hit) =>
+        val bounceDirection = (hit.point + hit.normal + Vec3.randomInUnitSphereUnit) - hit.point
+        0.5 * rayColor(Ray(hit.point, bounceDirection), depth - 1)
 
 end Renderer

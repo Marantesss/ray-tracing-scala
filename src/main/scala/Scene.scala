@@ -1,19 +1,14 @@
 package com.marantesss.raytracingscala
 
-import utils.{Color, Ray, Vec3}
-
-import com.marantesss.raytracingscala.props.{HitResult, Prop, Sphere}
-import com.marantesss.raytracingscala.props.HitResult.{Hit, NoHit}
+import utils.{Color, Ray, Vec3, HitResult}
+import props.Prop
 
 case class Scene(
     props: Seq[Prop],
 ):
-  def propHits(ray: Ray, tMin: Double, tMax: Double): HitResult =
+  def propHits(ray: Ray, tMin: Double, tMax: Double): Option[HitResult] =
     props
-      .map(_.hit(ray, tMin, tMax))                       // calculate hits
-      .sortWith(_.distanceToOrigin < _.distanceToOrigin) // order by closest prop to origin/camera
-      .find {                                            // fetch the first (closest) hit
-        case Hit(_p, _n, _t, _f) => true
-        case _                   => false
-      }
-      .getOrElse(NoHit) // if not found then NoHit
+      .map(_.hit(ray, tMin, tMax)) // calculate hits
+      .collect({ case Some(h) => h }) // filter by defined values
+      .sortWith(_.t < _.t) // order by closest prop to origin/camera
+      .headOption          // get closest option if available
