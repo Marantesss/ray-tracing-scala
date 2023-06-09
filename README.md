@@ -360,15 +360,23 @@ def main(): Unit = {
 
 First render:
 
-![](media/book-1/8-diffuse.png)
+![](media/book-1/8.1-diffuse.png)
 
 Gamma correction:
 
-![](media/book-1/8-diffuse-gamma-correction.png)
+![](media/book-1/8.2-gamma-correction.png)
 
 Acne fix:
 
-![](media/book-1/8-diffuse-shadown-acne-fix.png)
+![](media/book-1/8.3-shadown-acne-fix.png)
+
+Lambertian distribution:
+
+![](media/book-1/8.4-lambertian-spheres.png)
+
+Alternative diffuse formulation:
+
+![](media/book-1/8.5-alternative-diffuse-formulation.png)
 
 ### 8. Metal
 

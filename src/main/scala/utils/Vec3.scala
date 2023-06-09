@@ -38,8 +38,22 @@ object Vec3:
     Utility.randomDoubleBetween(min, max),
     Utility.randomDoubleBetween(min, max),
   )
+
+  /** Option 1: Good enough Lambertian Reflection
+    */
   @tailrec
   def randomInUnitSphere: Vec3 =
     val hypothesis = Vec3.random(-1, 1)
     if hypothesis.lengthSquared < 1 then hypothesis else Vec3.randomInUnitSphere
+
+  /** Option 2: True Lambertian Reflection
+    */
+  def randomInUnitSphereUnit: Vec3 = randomInUnitSphere.unit
+
+  /** Option 3: An alternative diffuse formulation
+    */
+  def randomInUnitSphereHemisphere(normal: Vec3): Vec3 =
+    val n = Vec3.randomInUnitSphere
+    if n.dot(normal) > 0d then n else -n
+
 end Vec3

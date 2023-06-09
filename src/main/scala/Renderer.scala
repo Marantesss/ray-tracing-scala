@@ -26,10 +26,7 @@ case class Renderer(
     */
   private val GAMMA = 2d
 
-  def renderContent(
-      width: Int,
-      height: Int,
-  ): Seq[Seq[Color]] =
+  def renderContent(width: Int, height: Int): Seq[Seq[Color]] =
     println("Rendering Content...")
     val totalPixels = width * height
     Seq.tabulate[Color](height, width)((h, w) =>
@@ -55,7 +52,7 @@ case class Renderer(
       case NoHit =>
         Color.white.lerpStart(0.5 * (ray.direction.unit.y + 1.0), Color.skyBlue)
       case Hit(p, n, t, _f) =>
-        val bounceDirection = (p + n + Vec3.randomInUnitSphere) - p
+        val bounceDirection = (p + n + Vec3.randomInUnitSphereUnit) - p
         0.5 * rayColor(Ray(p, bounceDirection), depth - 1)
 
 end Renderer
