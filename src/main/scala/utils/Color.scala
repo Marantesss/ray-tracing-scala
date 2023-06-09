@@ -28,6 +28,12 @@ case class Color(
     blue + that.blue,
   )
 
+  def pow(operand: Double): Color = Color(
+    Math.pow(red, operand).toInt,
+    Math.pow(green, operand).toInt,
+    Math.pow(blue, operand).toInt,
+  )
+
   /** Linear interpolation
     */
   def lerpStart(t: Double, endColor: Color): Color = (1.0 - t) * this + t * endColor

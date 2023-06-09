@@ -299,7 +299,7 @@ Take a look at the [book's section on Antialiasing](https://raytracing.github.io
 to better understand how it works, but essentially we need to calculate the color of random viewport ray hits inside the
 pixel we're working on, and then merge these values together to get a blending color effect.
 
-#### 6.1 Creating a Renderer Case Class
+#### Creating a Renderer Case Class
 
 Let's move the render logic from our `main.scala` file into a dedicated file. Instead of outputting an Image, we just
 want it to output a Color matrix of a specified `width` and `height`. Breaking down the render logic for each color pixel:
@@ -356,9 +356,21 @@ def main(): Unit = {
 
 ![](media/book-1/7-antialiasing.png)
 
-### 8. Diffuse Materials
+### 7. Diffuse Materials
 
-WIP
+First render:
+
+![](media/book-1/8-diffuse.png)
+
+Gamma correction:
+
+![](media/book-1/8-diffuse-gamma-correction.png)
+
+Acne fix:
+
+![](media/book-1/8-diffuse-shadown-acne-fix.png)
+
+### 8. Metal
 
 ## Book 2: [_Ray Tracing The Next Week_](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
 

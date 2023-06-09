@@ -17,7 +17,3 @@ case class Scene(
         case _                   => false
       }
       .getOrElse(NoHit) // if not found then NoHit
-
-  def rayColor(ray: Ray): Color = this.propHits(ray, 0, Double.MaxValue) match
-    case NoHit => Color.white.lerpStart(0.5 * (ray.direction.unit.y + 1.0), Color.skyBlue)
-    case Hit(_p, n, t, _f) => 0.5 * (Color.fromRatio(1, 1, 1) + Color.fromRatio(n.x, n.y, n.z))

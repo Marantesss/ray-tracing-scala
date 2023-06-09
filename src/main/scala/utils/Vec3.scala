@@ -1,7 +1,9 @@
 package com.marantesss.raytracingscala
 package utils
 
-import scala.annotation.targetName
+import scala.annotation.{tailrec, targetName}
+import scala.compiletime.ops.float.Max
+import scala.util.Random
 
 case class Vec3(
     x: Double,
@@ -28,6 +30,16 @@ case class Vec3(
   )
 
 object Vec3:
-  def zero: Vec3 = Vec3(0, 0, 0)
-  def unit: Vec3 = Vec3(1, 1, 1)
+  def zero: Vec3   = Vec3(0, 0, 0)
+  def unit: Vec3   = Vec3(1, 1, 1)
+  def random: Vec3 = Vec3(Random.nextDouble(), Random.nextDouble(), Random.nextDouble())
+  def random(min: Double, max: Double): Vec3 = Vec3(
+    Utility.randomDoubleBetween(min, max),
+    Utility.randomDoubleBetween(min, max),
+    Utility.randomDoubleBetween(min, max),
+  )
+  @tailrec
+  def randomInUnitSphere: Vec3 =
+    val hypothesis = Vec3.random(-1, 1)
+    if hypothesis.lengthSquared < 1 then hypothesis else Vec3.randomInUnitSphere
 end Vec3

@@ -25,10 +25,6 @@ case class Image(
 
   def fillContent(content: Seq[Seq[Color]]): Image = copy(content = content)
 
-  def progress(percentage: Float): Unit =
-    println(s"${(percentage * 100).toInt}%")
-    Console.flush()
-
   /** Takes too long and consumes too much memory
     */
   def contentToString: String =
@@ -38,10 +34,10 @@ case class Image(
     row.foldLeft("")((accRow, byte) => s"$accRow$byte ").trim
 
   def write(writer: PrintWriter): Unit =
+    println("Writing File...")
     // header
     writer.write(s"P3\n$width $height\n${Color.BYTE_SIZE}\n")
     // content
-    content.zipWithIndex.foreach { row =>
-      writer.write(s"${rowToString(row(0))}\n")
-      progress(row(1).toFloat / height)
-    }
+    content
+      .map(rowToString)
+      .foreach(r => writer.write(s"$r\n"))
