@@ -295,6 +295,69 @@ visible.
 
 ### 6. Antialiasing
 
+Take a look at the [book's section on Antialiasing](https://raytracing.github.io/books/RayTracingInOneWeekend.html#antialiasing)
+to better understand how it works, but essentially we need to calculate the color of random viewport ray hits inside the
+pixel we're working on, and then merge these values together to get a blending color effect.
+
+#### 6.1 Creating a Renderer Case Class
+
+Let's move the render logic from our `main.scala` file into a dedicated file. Instead of outputting an Image, we just
+want it to output a Color matrix of a specified `width` and `height`. Breaking down the render logic for each color pixel:
+1. Create a sequence of `SAMPLES_PER_PIXEL` random values between 0 and 1
+2. Map those random values into the calculated with `u` and `v`
+3. Reduce that sequence into a unique Color which contains the sum of all RGB color values
+4. Divide that color by `SAMPLES_PER_PIXEL` which calculates the "average" color in the pixel
+
+```scala
+case class Renderer(viewport: Viewport, scene: Scene):
+  private val SAMPLES_PER_PIXEL = 100
+
+  def renderContent(width: Int, height: Int): Seq[Seq[Color]] =
+    Seq.tabulate[Color](height, width)((h, w) =>
+      Seq
+        .fill(SAMPLES_PER_PIXEL)(Random.nextDouble())       // step 1
+        .map { random =>                                    // step 2
+          val u = (w.toDouble + random) / (width - 1)
+          val v = (height - 1 - h + random) / (height - 1)
+          scene.rayColor(viewport.getRay(u, v))
+        }
+        .reduce(_ + _)                                      // step 3
+        /                                                   // step 4
+          SAMPLES_PER_PIXEL,
+    )
+```
+
+We'll then update our main function to:
+
+```scala
+@main
+def main(): Unit = {
+  val aspectRatio = 16.0 / 9.0
+  val width       = 400
+  val height      = (400 / aspectRatio).toInt
+
+  val viewport = Viewport()
+
+  val scene = Scene(
+    Seq(
+      Sphere(Vec3(0, -100.5, -1), 100),
+      Sphere(Vec3(0, 0, -1), 0.5),
+    ),
+  )
+
+  val content = Renderer(viewport, scene).renderContent(width, height)
+  Image(width, height)
+    .fillContent(content)
+    .write(
+      PrintWriter(File("output.ppm")),
+    )
+}
+```
+
+![](media/book-1/7-antialiasing.png)
+
+### 8. Diffuse Materials
+
 WIP
 
 ## Book 2: [_Ray Tracing The Next Week_](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
