@@ -380,6 +380,20 @@ Alternative diffuse formulation:
 
 ### 8. Metal
 
+1. Making `Material` trait
+2. `Renderer.rayColor` => `Lambertian.scatter`
+3. `Metals.scatter`
+
+Metals:
+
+![](media/book-1/9.1-metal-spheres.png)
+
+Fuzzyness:
+
+![](media/book-1/9.2-metal-spheres-fuzziness.png)
+
+### 9. Dielectrics
+
 ## Book 2: [_Ray Tracing The Next Week_](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
 
 WIP
