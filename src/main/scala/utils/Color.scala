@@ -28,6 +28,12 @@ case class Color(
     blue + that.blue,
   )
 
+  def *(that: Color): Color = Color(
+    red * that.red,
+    green * that.green,
+    blue * that.blue,
+  )
+
   def pow(operand: Double): Color = Color(
     Math.pow(red, operand).toInt,
     Math.pow(green, operand).toInt,

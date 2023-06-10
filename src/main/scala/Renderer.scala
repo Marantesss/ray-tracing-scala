@@ -47,10 +47,11 @@ case class Renderer(
     if (depth <= 0) then return Color.black
 
     scene.propHits(ray, T_MIN, Double.MaxValue) match
-      case None =>
-        Color.white.lerpStart(0.5 * (ray.direction.unit.y + 1.0), Color.skyBlue)
+      case None => Color.white.lerpStart(0.5 * (ray.direction.unit.y + 1.0), Color.skyBlue)
       case Some(hit) =>
-        val bounceDirection = (hit.point + hit.normal + Vec3.randomInUnitSphereUnit) - hit.point
-        0.5 * rayColor(Ray(hit.point, bounceDirection), depth - 1)
+        hit.material.scatter(ray, hit) match
+          case None => Color.black
+          case Some(scatter) =>
+            scatter.attenuation * rayColor(scatter.scattered, depth - 1) / Color.BYTE_SIZE
 
 end Renderer
