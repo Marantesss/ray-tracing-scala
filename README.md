@@ -362,23 +362,126 @@ def main(): Unit = {
 
 ### 7. Diffuse Materials
 
-First render:
+Picking random points in a unit sphere:
+
+```scala
+object Vec3:
+  // ...
+  def random: Vec3 = Vec3(Random.nextDouble(), Random.nextDouble(), Random.nextDouble())
+  def random(min: Double, max: Double): Vec3 = Vec3(
+    Utility.randomDoubleBetween(min, max),
+    Utility.randomDoubleBetween(min, max),
+    Utility.randomDoubleBetween(min, max),
+  )
+
+  @tailrec
+  def randomInUnitSphere: Vec3 =
+    val hypothesis = Vec3.random(-1, 1)
+    if hypothesis.lengthSquared < 1 then hypothesis else Vec3.randomInUnitSphere
+end Vec3
+```
+
+And updating the `rayColor` method:
+
+```scala
+case class Renderer(/* ... */):
+
+  private val MAX_RAY_BOUNCE = 50
+
+  def rayColor(ray: Ray, depth: Int = MAX_RAY_BOUNCE): Color =
+    if (depth <= 0) then return Color.black
+
+    scene.propHits(ray, 0, Double.MaxValue) match
+      case None => Color.white.lerpStart(0.5 * (ray.direction.unit.y + 1.0), Color.skyBlue)
+      case Some(hit) =>
+        val target = hit.point + hit.normal + Vec3.randomInUnitSphere
+        0.5 * rayColor(Ray(hit.point, target - hit.point), depth - 1)
+```
+
+Which will render:
 
 ![](media/book-1/8.1-diffuse.png)
 
-Gamma correction:
+As we can see (or not), the scene is a little dark. As the [book explains](https://raytracing.github.io/books/RayTracingInOneWeekend.html#diffusematerials/usinggammacorrectionforaccuratecolorintensity), we need to do some gamma correction:
+
+```scala
+case class Renderer(/* ... */):
+
+  private val GAMMA = 2d
+
+  def renderContent(width: Int, height: Int): Seq[Seq[Color]] =
+    val totalPixels = width * height
+    Seq.tabulate[Color](height, width)((h, w) =>
+      val progress = (h * width + (w + 1)) / totalPixels.toDouble * 100d
+      Seq
+        .fill(SAMPLES_PER_PIXEL)(Random.nextDouble())
+        .map { random =>
+          val u = (w.toDouble + random) / (width - 1)
+          val v = (height - 1 - h + random) / (height - 1)
+          rayColor(viewport.getRay(u, v))
+        }
+        .reduce(_ + _)
+        .pow(1 / GAMMA), // <--- add this here
+    )
+```
+
+and also add the `pow` method to our `Color` case class:
+
+```scala
+case class Color(/* ... */):
+  // ...
+  def pow(operand: Double): Color = Color(
+    Math.pow(red, operand).toInt,
+    Math.pow(green, operand).toInt,
+    Math.pow(blue, operand).toInt,
+  )
+```
 
 ![](media/book-1/8.2-gamma-correction.png)
 
-Acne fix:
+Fixing shadow acne is as easy as:
+
+```scala
+case class Renderer(/* ... */):
+  /** To fix shadow acne this value cannot be 0
+    */
+  private val T_MIN = 0.001
+
+  // ...
+  def rayColor(ray: Ray, depth: Int = MAX_RAY_BOUNCE): Color =
+    // ...
+    scene.propHits(ray, T_MIN, Double.MaxValue) match // <--- replace 0 with T_MIN
+      // ...
+```
 
 ![](media/book-1/8.3-shadown-acne-fix.png)
 
-Lambertian distribution:
+To have a true Lambertian distribution and an Alternative diffuse formaluation, we simply need to add options 2 and 3 to
+the `Vec3` object. And of course, update the `rayColor` method and use any of the 3 options to calculate the `target`.
+
+```scala
+object Vec3:
+  // ...
+  /** Option 1: Good enough Lambertian Reflection
+   */
+  @tailrec
+  def randomInUnitSphere: Vec3 =
+    val hypothesis = Vec3.random(-1, 1)
+    if hypothesis.lengthSquared < 1 then hypothesis else Vec3.randomInUnitSphere
+  
+  /** Option 2: True Lambertian Reflection
+   */
+  def randomInUnitSphereUnit: Vec3 = randomInUnitSphere.unit
+  
+  /** Option 3: An alternative diffuse formulation
+   */
+  def randomInUnitSphereHemisphere(normal: Vec3): Vec3 =
+    val n = Vec3.randomInUnitSphere
+    if n.dot(normal) > 0d then n else -n
+end Vec3
+```
 
 ![](media/book-1/8.4-lambertian-spheres.png)
-
-Alternative diffuse formulation:
 
 ![](media/book-1/8.5-alternative-diffuse-formulation.png)
 
