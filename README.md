@@ -487,9 +487,17 @@ end Vec3
 
 ### 8. Metal
 
-1. Making `Material` trait
-2. `Renderer.rayColor` => `Lambertian.scatter`
-3. `Metals.scatter`
+Let's create a [`trait`](https://docs.scala-lang.org/tour/traits.html) for `Material`, which will be extended by a `Lambertian` and `Metal` case class.
+1. `Lambertian` is our current implementation
+2. `Metal` will require a new implementation for reflective materials
+
+We'll also need a `ScatterResult` data structure which will contain the scattered ray and its attenuation.
+
+```scala
+trait Material(color: Color):
+  def scatter(ray: Ray, hit: HitResult): Option[ScatterResult]
+end Material
+```
 
 Metals:
 
