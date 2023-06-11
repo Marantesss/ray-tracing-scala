@@ -203,24 +203,27 @@ What we have to understand is that not only do we want to know if a ray hit the 
 3. $n$: the surface normal
 4. frontFacing: was the Sphere hit from the inside or the outside
 
-Let's create an [`enum`](https://docs.scala-lang.org/scala3/book/domain-modeling-tools.html#Enums_Scala_3_only) which has
+Let's create a data structure to model our hit results. As I see it, we have 2 options:
+1. use an [`enum`](https://docs.scala-lang.org/scala3/book/domain-modeling-tools.html#Enums_Scala_3_only) which has
 2 entries `Hit` and `NoHit`, where the first one will contain the values we need.
+2. Or use a simple case class, which alongside the [`Option`](https://dotty.epfl.ch/api/scala/Option.html) class can have
+`Some` or `None` value for hit or no hit respectively.
+
+In the end, I've decided to implement option 2.
 
 ```scala
-enum HitResult:
-  case NoHit
-  case Hit(
-      point: Vec3,
-      normal: Vec3,
-      t: Double,
-      frontFacing: Boolean = true,
-  )
+case class HitResult(
+  point: Vec3,
+  normal: Vec3,
+  t: Double,
+  frontFacing: Boolean = true,
+)
 ```
 
 we can now refactor our `Sphere.hit` method to this include this data structure and well as [simplify it](https://raytracing.github.io/books/RayTracingInOneWeekend.html#surfacenormalsandmultipleobjects/simplifyingtheray-sphereintersectioncode):
 
 ```scala
-  def hit(ray: Ray, tMin: Double, tMax: Double): HitResult =
+  def hit(ray: Ray, tMin: Double, tMax: Double): Option[HitResult] =
     val origin = ray.origin - center
     // same as ray.direction.dot(ray.direction)
     val a = ray.direction.lengthSquared
@@ -229,7 +232,7 @@ we can now refactor our `Sphere.hit` method to this include this data structure 
     val c            = origin.lengthSquared - Math.pow(radius, 2)
     val discriminant = Math.pow(halfB, 2) - a * c
 
-    if discriminant < 0 then return HitResult.NoHit
+    if discriminant < 0 then return None
 
     val sqrtDiscriminant = Math.sqrt(discriminant)
     val t = Seq(
@@ -237,25 +240,25 @@ we can now refactor our `Sphere.hit` method to this include this data structure 
       (-halfB + sqrtDiscriminant) / a,
     ).find(x => !(x < tMin || x > tMax))
 
-    if t.isEmpty then
-      HitResult.NoHit
-    else
-      val point = ray.at(t.get)
-      HitResult
-        .Hit(
-          point = point,
-          normal = (point - center) / radius,
-          t = t.get,
-        )
+    if t.isEmpty then return None
+
+    val point = ray.at(t.get)
+    Option(
+       HitResult(
+        point = point,
+        normal = (point - center) / radius,
+       t = t.get,
+      )
         .setFaceNormal(ray)
+   )
 ```
 
 and update our `rayColor` function to:
 
 ```scala
 def rayColor(ray: Ray): Color = Sphere(Vec3(0, 0, -1), 0.5).hit(ray, 0, Double.MaxValue) match
-  case NoHit => Color.white.lerpStart(0.5 * (ray.direction.unit.y + 1.0), Color.skyBlue)
-  case Hit(_p, n, t, _f) => 0.5 * (Color.fromRatio(1, 1, 1) + Color.fromRatio(n.x, n.y, n.z))
+  case None => Color.white.lerpStart(0.5 * (ray.direction.unit.y + 1.0), Color.skyBlue)
+  case Some(hit) => 0.5 * (Color.fromRatio(1, 1, 1) + Color.fromRatio(hit.normal.x, hit.normal.y, hit.normal.z))
 ```
 
 ![](media/book-1/6.1-surface-normals.png)
@@ -266,22 +269,17 @@ Now we can create a `Scene` case class which will take care of storing our Props
 casting and tracing rays.
 
 ```scala
-case class Scene(
-  props: Seq[Prop],
-):
-  def propHits(ray: Ray, tMin: Double, tMax: Double): HitResult = 
+case class Scene(props: Seq[Prop]):
+  def propHits(ray: Ray, tMin: Double, tMax: Double): Option[HitResult] = 
     props
-      .map(_.hit(ray, tMin, tMax))                       // calculate hits
-      .sortWith(_.distanceToOrigin < _.distanceToOrigin) // order by closest prop to origin/camera
-      .find {                                            // fetch the first (closest) hit
-        case Hit(_p, _n, _t, _f) => true
-        case _                   => false
-      }
-      .getOrElse(NoHit) // if not found then NoHit
+      .map(_.hit(ray, tMin, tMax)) // calculate hits
+      .collect({ case Some(h) => h }) // filter by defined values
+      .sortWith(_.t < _.t) // order by closest prop to origin/camera
+      .headOption          // get closest option if available
 
   def rayColor(ray: Ray): Color = this.propHits(ray, 0, Double.MaxValue) match
-    case NoHit => Color.white.lerpStart(0.5 * (ray.direction.unit.y + 1.0), Color.skyBlue)
-    case Hit(_p, n, t, _f) => 0.5 * (Color.fromRatio(1, 1, 1) + Color.fromRatio(n.x, n.y, n.z))
+    case None => Color.white.lerpStart(0.5 * (ray.direction.unit.y + 1.0), Color.skyBlue)
+    case Some(hit) => 0.5 * (Color.fromRatio(1, 1, 1) + Color.fromRatio(hit.normal.x, hit.normal.y, hit.normal.z))
 ```
 
 - `propHits`: this method takes a ray and the min and max distance the origin to render. It hits all props, orders by
@@ -308,6 +306,8 @@ want it to output a Color matrix of a specified `width` and `height`. Breaking d
 3. Reduce that sequence into a unique Color which contains the sum of all RGB color values
 4. Divide that color by `SAMPLES_PER_PIXEL` which calculates the "average" color in the pixel
 
+While we're at it, let's place the `rayColor` method here as well:
+
 ```scala
 case class Renderer(viewport: Viewport, scene: Scene):
   private val SAMPLES_PER_PIXEL = 100
@@ -319,12 +319,16 @@ case class Renderer(viewport: Viewport, scene: Scene):
         .map { random =>                                    // step 2
           val u = (w.toDouble + random) / (width - 1)
           val v = (height - 1 - h + random) / (height - 1)
-          scene.rayColor(viewport.getRay(u, v))
+          rayColor(viewport.getRay(u, v))
         }
         .reduce(_ + _)                                      // step 3
         /                                                   // step 4
           SAMPLES_PER_PIXEL,
     )
+
+  def rayColor(ray: Ray): Color = scene.propHits(ray, 0, Double.MaxValue) match
+    case None => Color.white.lerpStart(0.5 * (ray.direction.unit.y + 1.0), Color.skyBlue)
+    case Some(hit) => 0.5 * (Color.fromRatio(1, 1, 1) + Color.fromRatio(hit.normal.x, hit.normal.y, hit.normal.z))
 ```
 
 We'll then update our main function to:
