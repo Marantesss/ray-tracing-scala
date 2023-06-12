@@ -491,23 +491,113 @@ Let's create a [`trait`](https://docs.scala-lang.org/tour/traits.html) for `Mate
 1. `Lambertian` is our current implementation
 2. `Metal` will require a new implementation for reflective materials
 
-We'll also need a `ScatterResult` data structure which will contain the scattered ray and its attenuation.
-
 ```scala
 trait Material(color: Color):
   def scatter(ray: Ray, hit: HitResult): Option[ScatterResult]
 end Material
 ```
 
-Metals:
+We'll also need a `ScatterResult` data structure which will contain the scattered ray and its attenuation.
+
+```scala
+case class ScatterResult(scattered: Ray, attenuation: Color)
+```
+
+Now, we need to add a `Material` type attribute to the `HitResult` case class, as well as out `Prop` trait.
+
+So, our current implementation of `Lambertian` material will look something like:
+
+```scala
+case class Lambertian(albedo: Color) extends Material(albedo):
+  def scatter(ray: Ray, hit: HitResult): Option[ScatterResult] =
+    val scatterDirection      = hit.normal + Vec3.randomInUnitSphereUnit
+    val finalScatterDirection = if scatterDirection.isNearZero then hit.normal else scatterDirection
+    Option(ScatterResult(Ray(hit.point, finalScatterDirection), albedo))
+end Lambertian
+```
+
+And our `Metal` material with fuzziness will be something like:
+
+```scala
+case class Metal(albedo: Color, fuzz: Double = 1) extends Material(albedo):
+  private val fuzziness = Utility.clamp(fuzz, 0d, 1d)
+  def scatter(ray: Ray, hit: HitResult): Option[ScatterResult] =
+    val scatterReflection = ray.direction.reflect(hit.normal).unit
+    val scattered         = Ray(hit.point, scatterReflection + fuzziness * Vec3.randomInUnitSphere)
+    if scattered.direction.dot(hit.normal) > 0 then Option(ScatterResult(scattered, albedo))
+    else None
+end Metal
+```
 
 ![](media/book-1/9.1-metal-spheres.png)
-
-Fuzzyness:
 
 ![](media/book-1/9.2-metal-spheres-fuzziness.png)
 
 ### 9. Dielectrics
+
+Creating the `refract` function:
+
+```scala
+def refract(normal: Vec3, refractionRatio: Double): Vec3 =
+  val cosTheta      = Math.min((-this).dot(normal), 1d)
+  val perpendicular = refractionRatio * (this + cosTheta * normal)
+  val parallel      = -Math.sqrt(Math.abs(1d - perpendicular.lengthSquared)) * normal
+  perpendicular + parallel
+```
+
+and the Dialetric material:
+
+```scala
+case class Dielectric(refractionIndex: Double) extends Material(Color.white):
+  def scatter(ray: Ray, hit: HitResult): Option[ScatterResult] =
+    val refractionRatio = if hit.frontFacing then (1d / refractionIndex) else refractionIndex
+    val unitDirection   = ray.direction.unit
+
+    val refracted = unitDirection.refract(hit.normal, refractionRatio)
+
+    Option(ScatterResult(Ray(hit.point, refracted), Color.white))
+end Dielectric
+```
+
+and then updating the scene with this new material:
+
+![](media/book-1/10.1-glass-sphere-that-always-refracts.png)
+
+Determining if the Ray can refract:
+
+```scala
+case class Dielectric(refractionIndex: Double) extends Material(Color.white):
+  def scatter(ray: Ray, hit: HitResult): Option[ScatterResult] =
+    val refractionRatio = if hit.frontFacing then (1d / refractionIndex) else refractionIndex
+    val unitDirection   = ray.direction.unit
+
+    val cosTheta   = Math.min((-unitDirection).dot(hit.normal), 1d)
+    val sinTheta   = Math.sqrt(1d - cosTheta * cosTheta);
+    val canRefract = refractionRatio * sinTheta <= 1.0
+
+    val refracted =
+      if canRefract then unitDirection.refract(hit.normal, refractionRatio)
+      else unitDirection.reflect(hit.normal)
+
+    Option(ScatterResult(Ray(hit.point, refracted), Color.white))
+end Dielectric
+```
+
+![](media/book-1/10.2-glass-sphere-that-sometimes-refracts.png)
+
+Then adding [Schlick's approximation](https://en.wikipedia.org/wiki/Schlick%27s_approximation):
+
+```scala
+  private def reflectance(cos: Double, refIdx: Double): Double =
+    val r0 = Math.pow((1 - refIdx) / (1 + refIdx), 2)
+    r0 + (1 - r0) * Math.pow((1 - cos), 5);
+```
+
+Finally [modeling a hallow glass sphere](https://raytracing.github.io/books/RayTracingInOneWeekend.html#dielectrics/modelingahollowglasssphere):
+
+![](media/book-1/10.3-hollow-glass-sphere.png)
+
+### 10. Positionable Camera
 
 ## Book 2: [_Ray Tracing The Next Week_](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
 
