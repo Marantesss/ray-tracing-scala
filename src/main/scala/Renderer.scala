@@ -14,7 +14,7 @@ case class Renderer(
 
   /** Color samples per pixel render for antialiasing
     */
-  private val SAMPLES_PER_PIXEL = 100
+  private val SAMPLES_PER_PIXEL = 500
 
   /** Max recursive calls of rayColor
     */

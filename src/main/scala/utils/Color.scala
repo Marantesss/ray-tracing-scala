@@ -1,6 +1,8 @@
 package com.marantesss.raytracingscala
 package utils
 
+import scala.util.Random
+
 /** Byte is [-128, ..., 127]
   */
 case class Color(
@@ -55,4 +57,11 @@ object Color:
   def black: Color   = Color(0, 0, 0)
   def skyBlue: Color = Color.fromRatio(0.5, 0.7, 1.0)
   def red: Color     = Color.fromRatio(1, 0, 0)
+  def random: Color = Color.fromRatio(Random.nextDouble(), Random.nextDouble(), Random.nextDouble())
+  def random(min: Double, max: Double): Color = Color.fromRatio(
+    Utility.randomDoubleBetween(min, max),
+    Utility.randomDoubleBetween(min, max),
+    Utility.randomDoubleBetween(min, max),
+  )
+
 end Color

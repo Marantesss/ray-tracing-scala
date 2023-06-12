@@ -66,4 +66,9 @@ object Vec3:
     val n = Vec3.randomInUnitSphere
     if n.dot(normal) > 0d then n else -n
 
+  @tailrec
+  def randomInUnitDisk: Vec3 =
+    val hypothesis = Vec3(Utility.randomDoubleBetween(-1, 1), Utility.randomDoubleBetween(-1, 1), 0)
+    if hypothesis.lengthSquared < 1 then hypothesis else Vec3.randomInUnitDisk
+
 end Vec3
