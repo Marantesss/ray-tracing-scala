@@ -35,8 +35,8 @@ case class HitResult(
     * @return
     */
   def setFaceNormal(ray: Ray): HitResult =
-    val frontFacing = ray.direction.dot(normal) < 0
-    val newNormal   = if frontFacing then normal else -normal
-    copy(normal = newNormal)
+    val newFrontFacing = ray.direction.dot(normal) < 0
+    val newNormal   = if newFrontFacing then normal else -normal
+    copy(normal = newNormal, frontFacing = newFrontFacing)
 
 end HitResult

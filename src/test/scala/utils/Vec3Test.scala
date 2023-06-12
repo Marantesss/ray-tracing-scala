@@ -42,6 +42,24 @@ class Vec3Test extends AnyFunSpec:
     it("should create a vector with opposite direction") {
       assertResult(Vec3(-3, -6, -9))(-Vec3(3, 6, 9))
     }
+
+    it("should dot product 2 vectors") {
+      assertResult(12)(Vec3(1, 2, 3).dot(Vec3(4, -5, 6)))
+      assertResult(0)(Vec3(6, -1, 3).dot(Vec3(4, 18, -2)))
+    }
+
+    it("should reflect one vector with another") {
+      assertResult(Vec3(1, 1, 3))(Vec3(1, -1, 3).reflect(Vec3(0, 1, 0)))
+      assertResult(Vec3(1, 1, 0))(Vec3(1, -1, 0).reflect(Vec3(0, 1, 0)))
+    }
+
+    it("should refract one vector with another") {
+      val refracted = Vec3(1, -1, 0).unit
+      val result    = Vec3(1, -1, 0).unit.refract(Vec3(0, 1, 0).unit, 1d)
+      assertResult(f"${refracted.x}%1.12f")(f"${result.x}%1.12f")
+      assertResult(f"${refracted.y}%1.12f")(f"${result.y}%1.12f")
+      assertResult(f"${refracted.z}%1.12f")(f"${result.z}%1.12f")
+    }
   }
 
   describe("Constants") {

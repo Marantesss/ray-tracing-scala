@@ -1,6 +1,8 @@
 package com.marantesss.raytracingscala
 package utils
 
+import com.marantesss.raytracingscala.utils.Vec3.randomInUnitSphere
+
 import scala.annotation.{tailrec, targetName}
 import scala.compiletime.ops.float.Max
 import scala.util.Random
@@ -28,6 +30,12 @@ case class Vec3(
     x * that.y - y * that.x,
   )
   def reflect(that: Vec3): Vec3 = this - 2 * this.dot(that) * that
+
+  def refract(normal: Vec3, refractionRatio: Double): Vec3 =
+    val cosTheta      = Math.min((-this).dot(normal), 1d)
+    val perpendicular = refractionRatio * (this + cosTheta * normal)
+    val parallel      = -Math.sqrt(Math.abs(1d - perpendicular.lengthSquared)) * normal
+    perpendicular + parallel
 
 end Vec3
 
