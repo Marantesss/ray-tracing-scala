@@ -8,13 +8,21 @@ import java.io.{File, PrintWriter}
 import scala.util.Random
 
 @main
-def main(): Unit = {
+def main(): Unit =
+
   // Image
+  val R           = Math.cos(Math.PI / 4d)
   val aspectRatio = 16.0 / 9.0
   val width       = 400
   val height      = (400 / aspectRatio).toInt
 
-  val viewport = Viewport()
+  val viewport = Viewport(
+    Vec3(-2, 2, 1),
+    Vec3(0, 0, -1),
+    Vec3(0, 1, 0),
+    90d,
+    aspectRatio,
+  )
 
   // World
   val materialGround = Lambertian(Color.fromRatio(0.8, 0.8, 0.0))
@@ -25,7 +33,7 @@ def main(): Unit = {
   val sphereGround = Sphere(Vec3(0.0, -100.5, -1.0), 100, materialGround)
   val sphereCenter = Sphere(Vec3(0.0, 0.0, -1.0), 0.5, materialCenter)
   val sphereLeft   = Sphere(Vec3(-1.0, 0.0, -1.0), 0.5, materialLeft)
-  val sphereLeft1   = Sphere(Vec3(-1.0, 0.0, -1.0), -0.4, materialLeft)
+  val sphereLeft1  = Sphere(Vec3(-1.0, 0.0, -1.0), -0.4, materialLeft)
   val sphereRight  = Sphere(Vec3(1.0, 0.0, -1.0), 0.5, materialRight)
 
   val scene = Scene()
@@ -43,4 +51,3 @@ def main(): Unit = {
     .write(
       PrintWriter(File("batata.ppm")),
     )
-}
